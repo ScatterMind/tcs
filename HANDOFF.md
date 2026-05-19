@@ -111,6 +111,7 @@ _Meta-session writes here; tcs's per-repo Claude reads at SessionStart for direc
   dev branch name and record it under "Dev branch" above; (4)
   when trading-app-revamp work starts, that lives in a new repo
   (`ScatterMind/coin-shack-app` or similar name TBD), not here.
+- **2026-05-19 — `.claude/settings.json` hook regex hardened (meta #22).** The Bash PreToolUse `git push` deny regex now also catches the `+main`/`+master` refspec force-push form (character class `[[:space:]:+]`, was `[[:space:]:]`). Found during tcs's own branch-protection testing today: `git push origin +main` bypassed the hook because no space-or-colon preceded "main"; tcs's server-side protection caught it (HTTP 403) but the hook should be the first layer. This PR mirrors the byte-identical canonical to tcs (the scaffold push earlier today shipped the older regex). **No action required**: behavior change only affects force-push attempts on main, which are blocked at both layers now.
 
 ## For meta
 _tcs's per-repo Claude writes here when there's something meta
