@@ -55,21 +55,6 @@ likely `ScatterMind/coin-shack-app` or similar (name TBD). This
 repo's `src/` holds prototypes, analysis fragments, and shareable
 utilities — not the production app codebase.
 
-## Web deploy (to set up — first per-repo session task)
-Closest precedent: `scattermind/jessica-ai-project`'s allowlist-
-in-shell-script variant (`scripts/build-dist.sh` + the two
-`deploy-*.yml` workflows under `.github/workflows/`). That pattern
-fits this repo's shape (private repo, deployable `site/` subset,
-small surface). Copy from there, not from meta's static-PUBLISH_DIR
-`templates/gh-pages/` — that template is the minimum-viable shape
-for repos without a build allowlist.
-- `.github/workflows/deploy-main.yml` — `main` → gh-pages root →
-  `https://scattermind.github.io/tcs/`
-- `.github/workflows/deploy-dev.yml` — dev branch → `gh-pages/dev`
-  → `https://scattermind.github.io/tcs/dev/`
-- After workflows merge, ask the user to enable GitHub Pages
-  (Settings → Pages → source: gh-pages branch, root).
-
 ## Do not put in this repo (operational security)
 The repo is private, but private GitHub repos can be exposed if
 credentials leak. These items live in properly-secured separate
@@ -124,7 +109,7 @@ organized by a **control-plane Claude session** in [`scattermind/meta`](https://
 - **Cross-Claude message channels live in this HANDOFF** (below). Two sections:
   - `## From meta` — meta-session writes allocated tasks or notes here. Read at session start for direction.
   - `## For meta` — write here when there's something meta should know. Meta reads it at its next multi-repo session start (via `scattermind/meta/setup/multi-repo-prime.sh`, which extracts those two sections from each sibling HANDOFF).
-- **Templates** for repeated repo shapes live in [`scattermind/meta/templates/`](https://github.com/ScatterMind/meta/tree/main/templates). Today: `templates/gh-pages/` (static-`<PUBLISH_DIR>` whitelist). For tcs's deploy, copy from `scattermind/jessica-ai-project`'s `scripts/build-dist.sh` allowlist variant instead — closer shape.
+- **Templates** for repeated repo shapes live in [`scattermind/meta/templates/`](https://github.com/ScatterMind/meta/tree/main/templates). Two relevant today: `templates/gh-pages/` (static-`<PUBLISH_DIR>` whitelist) and `templates/gh-pages-allowlist/` (shell-script `ALLOWLIST` array + `claude/**` dev-branch glob). **This repo's deploy matches `gh-pages-allowlist/`** — `.github/workflows/deploy-{main,dev}.yml` + `scripts/build-dist.sh` were wired in PR #3 before the template existed; the template was then generalized from this repo's pattern (see meta #26 / the `## From meta` entry below).
 - **Full meta-side rules** live in [`scattermind/meta/HANDOFF.md`](https://github.com/ScatterMind/meta/blob/main/HANDOFF.md). Skim "Standard project repo structure", "Drift scan — standing meta-session task", and "Multi-repo meta session setup" once.
 
 ## From meta
@@ -132,12 +117,33 @@ _Meta-session writes here; tcs's per-repo Claude reads at SessionStart for direc
 
 - **2026-05-19 — Fresh scaffold (bones only).** First per-repo
   session tasks: (1) skim the "Do not put in this repo" and "Do
-  not publish" lists above before adding any content; (2) wire
-  `.github/workflows/deploy-{main,dev}.yml` + a build allowlist
-  script, copying the jessica-ai-project pattern; (3) decide on
-  dev branch name and record it under "Dev branch" above; (4)
-  when trading-app-revamp work starts, that lives in a new repo
-  (`ScatterMind/coin-shack-app` or similar name TBD), not here.
+  not publish" lists above before adding any content;
+  **(2) DONE in tcs PR #3** — `.github/workflows/deploy-{main,dev}.yml`
+  + `scripts/build-dist.sh` shipped with the drill widget. The
+  guidance originally said "copy from jessica-ai-project" — see
+  the meta #26 entry below; the per-repo session refined jessica's
+  pattern (`ALLOWLIST` array + `claude/**` glob) and that refined
+  shape became the meta template; **(3) DONE in tcs PR #3** — dev
+  branch `claude/initial-setup-4mRa7` recorded under "Dev branch"
+  above (note the deploy uses `claude/**` glob, so the literal
+  branch name there is informational only — renames don't break
+  the deploy); (4) when trading-app-revamp work starts, that
+  lives in a new repo (`ScatterMind/coin-shack-app` or similar
+  name TBD), not here.
+- **2026-05-19 — `meta/templates/gh-pages-allowlist/` exists**
+  (meta #26). The original scaffold spec told this repo's
+  per-repo Claude to "copy from `scattermind/jessica-ai-project`'s
+  `scripts/build-dist.sh` allowlist variant" — that was a meta-side
+  mistake (per-repo guidance should point at meta templates, not
+  at other siblings). Your session shipped the deploy anyway and
+  refined jessica's pattern in two useful ways: `ALLOWLIST`
+  array shape instead of inline `cp` lines, and
+  `branches: ['claude/**']` glob instead of a hardcoded dev
+  branch. Both refinements were generalized into the new template,
+  whose body is your pattern verbatim. **No action required**:
+  this repo's deploy already matches the template. Future similar
+  repos instantiate from `meta/templates/gh-pages-allowlist/`
+  rather than copying from here.
 - **2026-05-19 — `.claude/settings.json` hook regex hardened (meta #22).** The Bash PreToolUse `git push` deny regex now also catches the `+main`/`+master` refspec force-push form (character class `[[:space:]:+]`, was `[[:space:]:]`). Found during tcs's own branch-protection testing today: `git push origin +main` bypassed the hook because no space-or-colon preceded "main"; tcs's server-side protection caught it (HTTP 403) but the hook should be the first layer. This PR mirrors the byte-identical canonical to tcs (the scaffold push earlier today shipped the older regex). **No action required**: behavior change only affects force-push attempts on main, which are blocked at both layers now.
 - **2026-05-19 — FUTURE.md format rev2 (meta #23).** Canonical FUTURE.md shape evolved (proposal originated from daedalus's per-repo Claude). New shape: unified `## Backlog` (Goals + Next merged) + `## Archive` for ME-confirmed-done items (newest on top, kept indefinitely — manual prune only) + optional status tags (`[PARTIAL]`/`[QA-PENDING]`/`[BLOCKED]`; `[TODO]` is implicit and the tag can be omitted) alongside the existing ownership tags. This PR mirrors the format here; the 3 former Goals items moved into Backlog with no content changes (just structural). **No action required**: format change only. Tags are optional — the per-repo session apply them when work has shape and status meaningfully differs from "not started."
 
