@@ -32,4 +32,18 @@ meta` / `## For meta`), not here.
 (concrete, near-term — first per-repo Claude session populates as
 work begins)
 
-(empty)
+- Deploy wiring: `.github/workflows/deploy-{main,dev}.yml` + a
+  build allowlist script (own design, not cross-repo copied). Was
+  paused last session on access-blocker, will resume when wired.
+  [AI]
+- AML / FINTRAC drill set — second drill page covering ID
+  thresholds, structuring red flags, third-party transactions,
+  source-of-funds questioning, travel-rule originator info. [AI]
+- Customer-side weirdness drill set — scam-victim red flags,
+  wallet-help boundaries, counterfeit cash, mid-transaction
+  cancellation, post-trade disputes. [AI]
+- Expand trade-mechanics scenarios in `src/drills/` — partial-cash
+  + Interac, foreign currency at the till, wallet-newbie variants.
+  [AI]
+- Once `site/` deploy lands, lift `src/drills/` into a `site/`
+  widget for the inherited employee. [AI]

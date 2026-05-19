@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trade Mechanics Drill — The Coin Shack</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Trade Mechanics Drill</h1>
+    <nav>
+      <button class="tab" data-tab="drill" aria-pressed="true">Drill</button>
+      <button class="tab" data-tab="flowchart" aria-pressed="false">Flowchart</button>
+      <button class="tab" data-tab="reference" aria-pressed="false">Reference</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="tab-drill" class="tab-panel" aria-hidden="false">
+      <div class="controls">
+        <button id="generate" class="primary">Generate scenario</button>
+        <label class="filter">
+          <input type="checkbox" id="filter-edge" checked>
+          Include edge cases (stale quote, mid-move, round ask)
+        </label>
+      </div>
+
+      <article id="scenario-card" class="card" hidden>
+        <div class="scenario-tag" id="scenario-tag"></div>
+        <blockquote id="customer-line"></blockquote>
+        <div class="scenario-context" id="scenario-context"></div>
+        <button id="reveal" class="secondary">Reveal expected handling</button>
+
+        <div id="handling" class="handling" hidden>
+          <section>
+            <h3>Clarify first</h3>
+            <ul id="clarify"></ul>
+          </section>
+          <section>
+            <h3>Math</h3>
+            <div id="math" class="math"></div>
+          </section>
+          <section>
+            <h3>Procedure</h3>
+            <ol id="procedure"></ol>
+          </section>
+          <section>
+            <h3>Pitfalls</h3>
+            <ul id="pitfalls" class="warn"></ul>
+          </section>
+        </div>
+      </article>
+
+      <p id="empty-state" class="muted">
+        Click <strong>Generate scenario</strong> to draw a random trade-mechanics drill.
+      </p>
+    </section>
+
+    <section id="tab-flowchart" class="tab-panel" aria-hidden="true" hidden>
+      <p class="muted">
+        Decision flow for any trade-mechanics interaction. Edge cases (stale
+        quote, mid-trade price move, round-number ask) are notes off the
+        main flow, not separate branches.
+      </p>
+      <div id="mermaid-target" class="mermaid"></div>
+    </section>
+
+    <section id="tab-reference" class="tab-panel" aria-hidden="true" hidden>
+      <h2>Symbols used in the drills</h2>
+      <p>
+        Drills use placeholder symbols, not the shop's actual numbers. Look
+        these up live or from shop policy before quoting.
+      </p>
+      <dl class="reference">
+        <dt><code>MID</code></dt>
+        <dd>Live mid-market BTC/CAD price from the shop's reference feed.</dd>
+        <dt><code>ASK</code></dt>
+        <dd>Shop's sell-to-customer price. <code>ASK = MID × (1 + s)</code> where <code>s</code> is the shop spread on the buy-side.</dd>
+        <dt><code>BID</code></dt>
+        <dd>Shop's buy-from-customer price. <code>BID = MID × (1 − s)</code> where <code>s</code> is the shop spread on the sell-side.</dd>
+        <dt><code>s</code></dt>
+        <dd>Shop spread (% over/under mid). Set per shop policy — not encoded here.</dd>
+        <dt>Quote validity</dt>
+        <dd>How long a price quote stays good. Per shop policy.</dd>
+        <dt>Confirmations</dt>
+        <dd>How many on-chain confirmations to wait for before paying out cash on a BTC→cash deposit. Per shop policy.</dd>
+      </dl>
+
+      <h2>What this drill covers</h2>
+      <p>Trade mechanics only (direction, constraint side, fee framing, quote handling, round-number asks). FINTRAC/AML and customer-side red flags are separate drill sets — not in this cut.</p>
+    </section>
+  </main>
+
+  <footer>
+    <span class="muted">Prototype. Lives in <code>src/drills/</code>; not yet deployed.</span>
+  </footer>
+
+  <script src="scenarios.js"></script>
+  <script src="flowchart.js"></script>
+  <script src="app.js"></script>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    window.__mermaid = mermaid;
+    mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "strict" });
+  </script>
+</body>
+</html>

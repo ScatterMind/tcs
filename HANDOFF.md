@@ -11,8 +11,20 @@ management, end-of-day accounting). **This repo is not the trading
 app** — it's the support workspace.
 
 ## Current state
-Fresh scaffold. Only the 5 standard files exist. No subdirs, no
-workflows, no content. Build out per the planned layout below.
+First session past the bones-only scaffold. `src/drills/` holds a
+trade-mechanics employee-training prototype: scenario + reveal
+widget (10 hand-crafted scenarios covering direction × pinned-side
+× mid-vs-ask framing × stale-quote / mid-move / round-ask edges)
+plus a Mermaid flowchart of the decision flow. Vanilla HTML + JS,
+no build step, Mermaid via CDN. Numbers (spread, confirmation
+counts, quote validity, rounding) are placeholders — operator
+fills from shop policy; nothing shop-specific is encoded.
+
+`notes/`, `corpus/`, `site/` are still empty. Deploy wiring
+(`.github/workflows/`) is still TODO — was blocked previous session
+on cross-repo access; pivoted to content this session per user
+direction. The drill widget is currently file://-openable from
+`src/drills/index.html`; will lift to `site/` once deploys exist.
 
 ## Planned layout (build as needed)
 - `notes/` — sporadic dumps + process documentation from training.
@@ -85,8 +97,11 @@ before granting access. A future session proposing to add anyone
 should pause and confirm with the user.
 
 ## Dev branch
-None yet. First per-repo Claude session to do real work should
-create one and record its name here.
+`claude/initial-setup-4mRa7` — current active dev branch (per-repo
+harness assigned it at session start). When `.github/workflows/
+deploy-dev.yml` is wired, prefer matching `claude/*` rather than a
+specific branch name so future sessions on new dev branches keep
+deploying without workflow edits.
 
 ## Meta AI / cross-repo coordination
 
