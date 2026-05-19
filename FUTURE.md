@@ -41,17 +41,19 @@ populates as work begins.)
 - **Small shareable widgets in `site/`** — that help the brother /
   wife / inherited employee with day-to-day ops, since they aren't
   GitHub collaborators.
-
-## Archive
-
-_Completed items move here from `## Backlog` once ME-confirmed.
-Newest on top. Keep entries indefinitely — pruning is a manual
-call by ME when the section gets too long._
-
 - Enable GitHub Pages in repo Settings → Pages (source: gh-pages
-  branch, root) after the deploy-wiring PR merges. Confirm
-  `https://scattermind.github.io/tcs/dev/drills/` and
-  `https://scattermind.github.io/tcs/drills/` resolve. [ME]
+  branch, root). Confirm `https://scattermind.github.io/tcs/dev/drills/`
+  and `https://scattermind.github.io/tcs/drills/` resolve. [ME]
+- Intake mechanism for sporadic training notes — operator-led AML
+  / shop-protocol session dumps need a path into `notes/`. Open:
+  paste-in-chat with AI committing, direct upload via GitHub web
+  UI, or another channel. Decide so notes don't pile up out-of-
+  band. [HYBRID]
+- Intake mechanism for Excel sheets, regulator docs, vendor
+  manuals, inherited operator paperwork — into `corpus/`. Open:
+  xlsx → CSV extraction for diffable storage, direct binary
+  commit, or hybrid (keep original + extract structured data
+  alongside). [HYBRID]
 - A small landing page at the site root (`site/index.html`) so
   `/` and `/dev/` aren't bare 404s — links to the widgets that
   exist. [AI]
@@ -64,3 +66,11 @@ call by ME when the section gets too long._
 - Expand trade-mechanics scenarios in `site/drills/` —
   partial-cash + Interac, foreign currency at the till,
   wallet-newbie variants. [AI]
+
+## Archive
+
+_Completed items move here from `## Backlog` once ME-confirmed.
+Newest on top. Keep entries indefinitely — pruning is a manual
+call by ME when the section gets too long._
+
+(empty)
