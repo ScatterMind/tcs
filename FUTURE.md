@@ -32,18 +32,19 @@ meta` / `## For meta`), not here.
 (concrete, near-term — first per-repo Claude session populates as
 work begins)
 
-- Deploy wiring: `.github/workflows/deploy-{main,dev}.yml` + a
-  build allowlist script (own design, not cross-repo copied). Was
-  paused last session on access-blocker, will resume when wired.
-  [AI]
+- Enable GitHub Pages in repo Settings → Pages (source: gh-pages
+  branch, root) after the deploy-wiring PR merges. Confirm
+  `https://scattermind.github.io/tcs/dev/drills/` and
+  `https://scattermind.github.io/tcs/drills/` resolve. [ME]
+- A small landing page at the site root (`site/index.html`) so
+  `/` and `/dev/` aren't bare 404s — links to the widgets that
+  exist. [AI]
 - AML / FINTRAC drill set — second drill page covering ID
   thresholds, structuring red flags, third-party transactions,
   source-of-funds questioning, travel-rule originator info. [AI]
 - Customer-side weirdness drill set — scam-victim red flags,
   wallet-help boundaries, counterfeit cash, mid-transaction
   cancellation, post-trade disputes. [AI]
-- Expand trade-mechanics scenarios in `src/drills/` — partial-cash
-  + Interac, foreign currency at the till, wallet-newbie variants.
-  [AI]
-- Once `site/` deploy lands, lift `src/drills/` into a `site/`
-  widget for the inherited employee. [AI]
+- Expand trade-mechanics scenarios in `site/drills/` —
+  partial-cash + Interac, foreign currency at the till,
+  wallet-newbie variants. [AI]
