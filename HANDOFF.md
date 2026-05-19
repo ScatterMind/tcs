@@ -11,8 +11,32 @@ management, end-of-day accounting). **This repo is not the trading
 app** — it's the support workspace.
 
 ## Current state
-Fresh scaffold. Only the 5 standard files exist. No subdirs, no
-workflows, no content. Build out per the planned layout below.
+First content past the bones-only scaffold, plus deploy wiring.
+
+`site/drills/` — trade-mechanics employee-training widget. Scenario
++ reveal UI (10 hand-crafted scenarios covering direction ×
+pinned-side × mid-vs-ask framing × stale-quote / mid-move /
+round-ask edges) plus a Mermaid flowchart of the decision flow.
+Vanilla HTML + JS, no build step, Mermaid via CDN. All numbers
+(spread, confirmation counts, quote validity, rounding) are
+symbolic placeholders — operator fills from shop policy; nothing
+shop-specific is encoded.
+
+`.github/workflows/deploy-{main,dev}.yml` + `scripts/build-dist.sh`
+— allowlist-driven static deploy to gh-pages. Allowlist is in the
+build script (one entry per `source:dest` pair). Main writes to
+gh-pages root with `keep_files: true` (preserves `dev/`); dev
+writes to `gh-pages/dev` with `keep_files: false` (wipes dev slot
+before each push). Dev workflow triggers on `claude/**` so future
+sessions on fresh branches deploy without workflow edits — only
+one active dev branch at a time, last-writer-wins on the dev slot.
+
+`notes/`, `corpus/`, `src/` are still empty (planned).
+
+**User action required after merge:** enable GitHub Pages in
+Settings → Pages, source: gh-pages branch, root. After that:
+- `https://scattermind.github.io/tcs/drills/` (main, post-merge)
+- `https://scattermind.github.io/tcs/dev/drills/` (current dev branch)
 
 ## Planned layout (build as needed)
 - `notes/` — sporadic dumps + process documentation from training.
@@ -85,8 +109,11 @@ before granting access. A future session proposing to add anyone
 should pause and confirm with the user.
 
 ## Dev branch
-None yet. First per-repo Claude session to do real work should
-create one and record its name here.
+`claude/initial-setup-4mRa7` — current active dev branch (per-repo
+harness assigned it at session start). When `.github/workflows/
+deploy-dev.yml` is wired, prefer matching `claude/*` rather than a
+specific branch name so future sessions on new dev branches keep
+deploying without workflow edits.
 
 ## Meta AI / cross-repo coordination
 

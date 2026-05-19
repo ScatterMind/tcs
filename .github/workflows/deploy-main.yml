@@ -1,0 +1,37 @@
+name: Deploy main
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Serialize gh-pages writes from main and dev so they don't race.
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build dist
+        run: bash scripts/build-dist.sh dist
+
+      # keep_files: true preserves the dev/ subdir on gh-pages.
+      # Trade-off: files removed from main's allowlist linger until
+      # a manual cleanup. Acceptable for now; revisit if it bites.
+      - name: Deploy to gh-pages root
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          keep_files: true
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: "deploy main: ${{ github.sha }}"

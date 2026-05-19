@@ -1,0 +1,40 @@
+name: Deploy dev
+
+on:
+  push:
+    # Match any dev branch under claude/. Future sessions get fresh
+    # branches; they all deploy to the same /dev slot (last writer
+    # wins). One active dev branch at a time is the working
+    # assumption.
+    branches: ['claude/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build dist
+        run: bash scripts/build-dist.sh dist
+
+      # destination_dir: dev + keep_files: false wipes only the dev/
+      # subdir on gh-pages, preserving the main deploy at root.
+      - name: Deploy to gh-pages/dev
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          destination_dir: dev
+          keep_files: false
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: "deploy dev (${{ github.ref_name }}): ${{ github.sha }}"

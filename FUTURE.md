@@ -48,4 +48,19 @@ _Completed items move here from `## Backlog` once ME-confirmed.
 Newest on top. Keep entries indefinitely — pruning is a manual
 call by ME when the section gets too long._
 
-(empty)
+- Enable GitHub Pages in repo Settings → Pages (source: gh-pages
+  branch, root) after the deploy-wiring PR merges. Confirm
+  `https://scattermind.github.io/tcs/dev/drills/` and
+  `https://scattermind.github.io/tcs/drills/` resolve. [ME]
+- A small landing page at the site root (`site/index.html`) so
+  `/` and `/dev/` aren't bare 404s — links to the widgets that
+  exist. [AI]
+- AML / FINTRAC drill set — second drill page covering ID
+  thresholds, structuring red flags, third-party transactions,
+  source-of-funds questioning, travel-rule originator info. [AI]
+- Customer-side weirdness drill set — scam-victim red flags,
+  wallet-help boundaries, counterfeit cash, mid-transaction
+  cancellation, post-trade disputes. [AI]
+- Expand trade-mechanics scenarios in `site/drills/` —
+  partial-cash + Interac, foreign currency at the till,
+  wallet-newbie variants. [AI]
