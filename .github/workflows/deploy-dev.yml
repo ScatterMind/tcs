@@ -7,6 +7,14 @@ on:
     # wins). One active dev branch at a time is the working
     # assumption.
     branches: ['claude/**']
+    # Only redeploy when something that actually ships changes. Without this,
+    # a push to ANY claude/** branch — including a meta config/docs mirror
+    # branch sitting on older code — rebuilds and clobbers the SHARED /dev
+    # preview (every claude/** branch publishes to the same destination_dir).
+    paths:
+      - 'site/**'
+      - 'scripts/build-dist.sh'
+      - '.github/workflows/deploy-dev.yml'
   workflow_dispatch:
 
 permissions:
