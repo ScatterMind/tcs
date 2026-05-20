@@ -129,6 +129,18 @@ organized by a **control-plane Claude session** in [`scattermind/meta`](https://
 ## From meta
 _Meta-session writes here; tcs's per-repo Claude reads at SessionStart for direction._
 
+- **2026-05-20 — SessionStart prime FRONT-LOADED + deploy-dev clobber fix
+  (meta #31).** (1) Prime: canonical `.claude/session-start-prime.sh` mirrored
+  byte-for-byte — front-loads diag + truncation note + `source=='compact'`
+  instruction + your resume block into the first ~2KB, slice 12000→6000,
+  `## From meta` inbox ONLY (drops `## For meta` + `FUTURE.md`); prime now ~10KB.
+  (2) **`deploy-dev.yml` got a `paths:` filter** so a meta config/docs mirror
+  branch can't rebuild + clobber your `/dev` (the `claude/**` glob + shared
+  `destination_dir` bug daedalus hit in its session 53). Only `site/**` /
+  `scripts/build-dist.sh` / the workflow now trigger a dev deploy.
+  `.claude/settings.json` UNCHANGED. **No action required** — keep your resume
+  block current.
+
 - **2026-05-20 — Compaction & priming overhaul (meta #27).** Canonical
   `.claude/settings.json` + a NEW byte-identical companion
   `.claude/session-start-prime.sh` shipped here byte-for-byte. SessionStart no
