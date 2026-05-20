@@ -94,11 +94,11 @@ before granting access. A future session proposing to add anyone
 should pause and confirm with the user.
 
 ## Dev branch
-`claude/initial-setup-4mRa7` — current active dev branch (per-repo
-harness assigned it at session start). When `.github/workflows/
-deploy-dev.yml` is wired, prefer matching `claude/*` rather than a
-specific branch name so future sessions on new dev branches keep
-deploying without workflow edits.
+`claude/future-intake-Q8mvR` — current active dev branch. Previous
+branch `claude/initial-setup-4mRa7` (deploy wiring + drill widget)
+merged via PR #3 and is now stale. The dev deploy workflow matches
+`claude/**`, so this branch publishes to `gh-pages/dev/` on push
+without workflow edits.
 
 ## Meta AI / cross-repo coordination
 
