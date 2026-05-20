@@ -1,5 +1,19 @@
 # Handoff
 
+<!-- RESUME BLOCK — overwrite in place each session (NOT an append-only entry).
+Keep ≤ ~1.2KB so it survives a 2KB preview; it is the head-slice's first content.
+See meta HANDOFF "## Compaction & priming (head-slice model)". -->
+
+**RESUME:** The Coin Shack support workspace (BTC/cash exchange takeover; this
+repo = training notes/widgets, NOT the trading app). **State:** drills widget +
+allowlist deploy shipped — see "## Current state"; resume cleanly unless an entry
+says otherwise. Before adding content, mind the "Do not put in this repo" / "Do
+not publish" lists below. **Dev branch:** `claude/future-intake-Q8mvR` (deploy
+triggers on `claude/**`). **## From meta:** check below — newest is the
+compaction/priming overhaul (meta #27), mirrored here, no action. **Read next:**
+this is a HEAD slice — Read HANDOFF.md in full + FUTURE.md before substantive
+work; a ~2KB preview means it truncated.
+
 ## What this repo is
 Private workspace for taking over **The Coin Shack** — a physical
 BTC/cash exchange shop in Markham, Ontario, Canada. The user (with
@@ -115,6 +129,21 @@ organized by a **control-plane Claude session** in [`scattermind/meta`](https://
 ## From meta
 _Meta-session writes here; tcs's per-repo Claude reads at SessionStart for direction._
 
+- **2026-05-20 — Compaction & priming overhaul (meta #27).** Canonical
+  `.claude/settings.json` + a NEW byte-identical companion
+  `.claude/session-start-prime.sh` shipped here byte-for-byte. SessionStart no
+  longer cats the whole HANDOFF — it injects a bounded HEAD slice (`head -c
+  12000` of HANDOFF + this `## From meta` inbox + FUTURE + VISION + a
+  read-on-demand note) so priming fits under the injection cap instead of
+  truncating to a ~2KB preview. `PreCompact` is REMOVED (the `continue:false`
+  block was live-confirmed ineffective on the web harness — it didn't stop
+  auto-summarize). Post-compaction capture moved to a `source=='compact'` branch
+  in the prime script; a temporary `[prime-diag: source=… blob=…B]` line is
+  appended to confirm the cap + whether that branch fires. **NEW convention:**
+  HANDOFF must open with a ≤1.2KB resume block (overwritten in place each
+  session) — this PR seeds one at the top here; keep it current. **No action
+  required** otherwise. Full rationale: meta HANDOFF "## Compaction & priming
+  (head-slice model)". Drift scan now checks BOTH mirrored files.
 - **2026-05-19 — Fresh scaffold (bones only).** First per-repo
   session tasks: (1) skim the "Do not put in this repo" and "Do
   not publish" lists above before adding any content;
