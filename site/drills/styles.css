@@ -10,6 +10,21 @@
   --warn-fg: #6b4400;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a17;
+    --fg: #ececea;
+    --muted: #9a9a90;
+    --accent: #6abf69;
+    --accent-fg: #0f1f0f;
+    --card-bg: #20211b;
+    --border: #34352c;
+    --warn-bg: #3a3320;
+    --warn-fg: #f0c674;
+  }
+  .math, code { background: #2a2b22; }
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -95,6 +110,47 @@ button.secondary {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+}
+
+.categories {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+.categories legend {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  padding: 0 0.4rem;
+}
+
+.filter.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.soon {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+  color: var(--muted);
+}
+
+#tier-filter {
+  font: inherit;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card-bg);
 }
 
 .card {

@@ -7,6 +7,10 @@
   Start([Customer arrives]) --> Greet[Greet · ask intent]
   Greet --> Dir{Direction?}
 
+  classDef redflag fill:#f8d7da,stroke:#721c24,color:#721c24;
+  RF["Red flag at intake: customer sizing tickets under $1k or total under $10k = structuring. Require ID, document, escalate, file STR if grounds. Do not facilitate or tip off."]:::redflag
+  Greet -.- RF
+
   Dir -->|Cash to BTC| C2B
   Dir -->|BTC to Cash| B2C
   Dir -->|Unclear / reversed terms| Restate[Restate direction in plain terms]

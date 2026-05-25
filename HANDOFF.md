@@ -13,14 +13,35 @@ app** — it's the support workspace.
 ## Current state
 First content past the bones-only scaffold, plus deploy wiring.
 
-`site/drills/` — trade-mechanics employee-training widget. Scenario
-+ reveal UI (10 hand-crafted scenarios covering direction ×
-pinned-side × mid-vs-ask framing × stale-quote / mid-move /
-round-ask edges) plus a Mermaid flowchart of the decision flow.
-Vanilla HTML + JS, no build step, Mermaid via CDN. All numbers
-(spread, confirmation counts, quote validity, rounding) are
-symbolic placeholders — operator fills from shop policy; nothing
-shop-specific is encoded.
+`site/drills/` — counter-training widget, scenario + reveal UI
+plus a Mermaid flowchart. Now PROCEDURALLY generated (rewritten
+from the original 10 hand-crafted scenarios per user direction).
+Two categories, toggled by checkboxes:
+- **trade** — 4 conversion types (direction × which side the
+  customer pins) × 4 CAD tiers ($100–1k / 1k–5k / 5k–10k / >10k).
+  Amount randomized within the tier (curated lists in
+  `scenarios.js`), phrasing rotates. Tier dropdown filters. Math
+  stays symbolic (MID/ASK/BID/s); no rate/spread encoded — the
+  curated btc[] amounts were just sized to land in their CAD
+  bucket.
+- **redflag** — AML structuring/smurfing, 3 variants (serial
+  same-day, split-on-spot, proxy ring). Teaches recognition +
+  the compliant response (24h aggregation, $1k ID line, $10k
+  report line, STR-no-threshold, no tipping-off). General FINTRAC
+  only — no shop SOP, per "Do not publish". No math section.
+
+Edge cases (stale-quote/mid-move/mid-vs-ask) and wildcards
+(round-ask/no-wallet/direction-confusion) were dropped from the
+drills per user direction; the flowchart still documents them as
+process notes. Greyed-out placeholder checkboxes signal planned
+categories: USDT, Basic, other-coin (not built — "Basic" label
+is a placeholder pending the user clarifying what it means vs the
+BTC trade category). Vanilla HTML + JS, no build step, Mermaid via
+CDN. Dark mode is automatic via `prefers-color-scheme` (CSS vars
+override + mermaid theme switch); no manual toggle yet.
+
+`scenarios.js` is testable headless: `eval` it with a stub
+`window`, then call `window.TCSDrills.generate({categories,tier})`.
 
 `.github/workflows/deploy-{main,dev}.yml` + `scripts/build-dist.sh`
 — allowlist-driven static deploy to gh-pages. Allowlist is in the
@@ -94,11 +115,11 @@ before granting access. A future session proposing to add anyone
 should pause and confirm with the user.
 
 ## Dev branch
-`claude/future-intake-Q8mvR` — current active dev branch. Previous
-branch `claude/initial-setup-4mRa7` (deploy wiring + drill widget)
-merged via PR #3 and is now stale. The dev deploy workflow matches
-`claude/**`, so this branch publishes to `gh-pages/dev/` on push
-without workflow edits.
+`claude/procedural-drills-Vn4xK` — current active dev branch.
+Prior branches `claude/initial-setup-4mRa7` (PR #3) and
+`claude/future-intake-Q8mvR` (PR #4) are merged and stale. The dev
+deploy workflow matches `claude/**`, so this branch publishes to
+`gh-pages/dev/` on push without workflow edits.
 
 ## Meta AI / cross-repo coordination
 
