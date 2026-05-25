@@ -16,29 +16,37 @@ First content past the bones-only scaffold, plus deploy wiring.
 `site/drills/` — counter-training widget, scenario + reveal UI
 plus a Mermaid flowchart. Now PROCEDURALLY generated (rewritten
 from the original 10 hand-crafted scenarios per user direction).
-Two categories, toggled by checkboxes:
-- **trade** — 4 conversion types (direction × which side the
-  customer pins) × 4 CAD tiers ($100–1k / 1k–5k / 5k–10k / >10k).
-  Amount randomized within the tier (curated lists in
-  `scenarios.js`), phrasing rotates. Tier dropdown filters. Math
-  stays symbolic (MID/ASK/BID/s); no rate/spread encoded — the
-  curated btc[] amounts were just sized to land in their CAD
-  bucket.
-- **redflag** — AML structuring/smurfing, 3 variants (serial
-  same-day, split-on-spot, proxy ring). Teaches recognition +
-  the compliant response (24h aggregation, $1k ID line, $10k
-  report line, STR-no-threshold, no tipping-off). General FINTRAC
-  only — no shop SOP, per "Do not publish". No math section.
+Two built categories, toggled by checkboxes (internal ids in
+`scenarios.js` are `trade` / `redflag`; UI labels are the user's
+terms):
+- **trade** = UI "Basic transactions (BTC)" — 4 conversion types
+  (direction × which side the customer pins) × 4 CAD tiers
+  ($100–1k / 1k–5k / 5k–10k / >10k). Amount randomized within the
+  tier (curated lists in `scenarios.js`), phrasing rotates. Tier
+  dropdown filters. Math stays symbolic (MID/ASK/BID/s); no
+  rate/spread encoded — the curated btc[] amounts were just sized
+  to land in their CAD bucket.
+- **redflag** = UI "Multiple no-KYC (structuring)" — AML
+  structuring/smurfing, 3 variants (serial same-day, split-on-
+  spot, proxy ring). Teaches recognition + the compliant response
+  (24h aggregation, $1k ID line, $10k report line, STR-no-
+  threshold, no tipping-off). General FINTRAC only — no shop SOP,
+  per "Do not publish". No math section.
+
+Interaction: Generate draws a scenario; Reveal toggles the
+handling; **Complete** logs it to a "last 10 completed" list and
+draws the next; **Skip** draws the next without logging. Completed
+list is in-memory (resets on reload), newest first, capped at 10,
+with a basic/no-KYC chip per entry.
 
 Edge cases (stale-quote/mid-move/mid-vs-ask) and wildcards
 (round-ask/no-wallet/direction-confusion) were dropped from the
 drills per user direction; the flowchart still documents them as
 process notes. Greyed-out placeholder checkboxes signal planned
-categories: USDT, Basic, other-coin (not built — "Basic" label
-is a placeholder pending the user clarifying what it means vs the
-BTC trade category). Vanilla HTML + JS, no build step, Mermaid via
-CDN. Dark mode is automatic via `prefers-color-scheme` (CSS vars
-override + mermaid theme switch); no manual toggle yet.
+categories: **USDT**, **other-coin** (not built). Vanilla HTML +
+JS, no build step, Mermaid via CDN. Dark mode is automatic via
+`prefers-color-scheme` (CSS vars override + mermaid theme switch);
+no manual toggle yet.
 
 `scenarios.js` is testable headless: `eval` it with a stub
 `window`, then call `window.TCSDrills.generate({categories,tier})`.

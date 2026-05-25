@@ -21,7 +21,10 @@
   }
 
   // Drill
-  $("generate").addEventListener("click", () => {
+  let current = null;
+  let completed = [];
+
+  function draw() {
     const categories = [];
     if ($("cat-trade").checked) categories.push("trade");
     if ($("cat-redflag").checked) categories.push("redflag");
@@ -30,10 +33,20 @@
       const empty = $("empty-state");
       empty.hidden = false;
       empty.textContent = "Select at least one category to draw a drill.";
+      current = null;
       return;
     }
     const tier = $("tier-filter").value;
-    renderScenario(window.TCSDrills.generate({ categories, tier }));
+    current = window.TCSDrills.generate({ categories, tier });
+    renderScenario(current);
+  }
+
+  $("generate").addEventListener("click", draw);
+  $("skip").addEventListener("click", draw);
+
+  $("complete").addEventListener("click", () => {
+    if (current) recordCompleted(current);
+    draw();
   });
 
   $("reveal").addEventListener("click", () => {
@@ -44,6 +57,35 @@
       ? "Reveal expected handling"
       : "Hide expected handling";
   });
+
+  function recordCompleted(s) {
+    completed.unshift({ category: s.category, context: s.context, line: s.line });
+    completed = completed.slice(0, 10);
+    renderCompleted();
+  }
+
+  function renderCompleted() {
+    const ol = $("completed-list");
+    const empty = $("completed-empty");
+    ol.innerHTML = "";
+    if (!completed.length) {
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+    completed.forEach((c) => {
+      const li = document.createElement("li");
+      const chip = document.createElement("span");
+      chip.className = "chip chip-" + c.category;
+      chip.textContent = c.category === "redflag" ? "no-KYC" : "basic";
+      li.appendChild(chip);
+      const txt = document.createElement("span");
+      txt.textContent =
+        (c.context ? c.context + " — " : "") + "“" + c.line + "”";
+      li.appendChild(txt);
+      ol.appendChild(li);
+    });
+  }
 
   function renderScenario(s) {
     $("empty-state").hidden = true;

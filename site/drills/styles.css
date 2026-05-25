@@ -217,6 +217,48 @@ blockquote {
   font-size: 0.95rem;
 }
 
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.completed {
+  margin-top: 2rem;
+}
+
+.completed h2 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 0.6rem 0;
+}
+
+.completed-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.completed-list li {
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.chip {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  margin-right: 0.45rem;
+  white-space: nowrap;
+}
+
+.chip-trade { background: var(--accent); color: var(--accent-fg); }
+.chip-redflag { background: #f8d7da; color: #721c24; }
+
 ul.warn li {
   color: var(--warn-fg);
 }
