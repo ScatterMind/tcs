@@ -36,19 +36,15 @@
         <legend>Categories</legend>
         <label class="filter">
           <input type="checkbox" id="cat-trade" checked>
-          Trade mechanics (BTC)
+          Basic transactions (BTC)
         </label>
         <label class="filter">
           <input type="checkbox" id="cat-redflag" checked>
-          Red flags (structuring)
+          Multiple no-KYC (structuring)
         </label>
         <label class="filter disabled" title="Planned — not built yet">
           <input type="checkbox" disabled>
           USDT transactions <span class="soon">soon</span>
-        </label>
-        <label class="filter disabled" title="Planned — not built yet">
-          <input type="checkbox" disabled>
-          Basic transactions <span class="soon">soon</span>
         </label>
         <label class="filter disabled" title="Planned — not built yet">
           <input type="checkbox" disabled>
@@ -60,7 +56,6 @@
         <div class="scenario-tag" id="scenario-tag"></div>
         <blockquote id="customer-line"></blockquote>
         <div class="scenario-context" id="scenario-context"></div>
-        <button id="reveal" class="secondary">Reveal expected handling</button>
 
         <div id="handling" class="handling" hidden>
           <section>
@@ -80,11 +75,23 @@
             <ul id="pitfalls" class="warn"></ul>
           </section>
         </div>
+
+        <div class="card-actions">
+          <button id="reveal" class="secondary">Reveal expected handling</button>
+          <button id="complete" class="primary">Complete &#10003;</button>
+          <button id="skip" class="secondary">Skip &#8594;</button>
+        </div>
       </article>
 
       <p id="empty-state" class="muted">
-        Click <strong>Generate scenario</strong> to draw a random trade-mechanics drill.
+        Click <strong>Generate scenario</strong> to draw a drill.
       </p>
+
+      <section class="completed">
+        <h2>Completed (last 10)</h2>
+        <ol id="completed-list" class="completed-list"></ol>
+        <p id="completed-empty" class="muted">None completed yet.</p>
+      </section>
     </section>
 
     <section id="tab-flowchart" class="tab-panel" aria-hidden="true" hidden>
