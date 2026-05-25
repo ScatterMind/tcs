@@ -31,9 +31,12 @@ terms):
   spot, proxy ring). Statements are phrased as casual basic
   buys with an offhand no-ID preference (that's how real
   structuring presents — the drill is catching it under friendly
-  framing), not overt "stay under the limit" talk. Amounts:
-  chunk < $1k (`{chunk}` $800–950), total < $10k (`{total}`
-  ≤$9k) so it's splittable into ≤10 sub-$1k tickets. Teaches
+  framing), not overt "stay under the limit" talk. Statements are
+  short and stop at "no KYC" (e.g. "Around $6,750 into BTC, no
+  KYC."). Amounts are randomly generated each draw via `randStep`
+  (not saved lists): chunk `randStep(400,950,50)` < $1k, total
+  `randStep(3000,9000,250)` < $10k → splittable into ≤10 sub-$1k
+  tickets. Teaches
   recognition + the compliant response (24h aggregation, $1k ID
   line, $10k report line, STR-no-threshold, no tipping-off).
   General FINTRAC only — no shop SOP, per "Do not publish". No

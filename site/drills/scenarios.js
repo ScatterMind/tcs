@@ -20,6 +20,9 @@
 (function () {
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
   const fill = (tpl, val, ph) => tpl.split(ph || "{amt}").join(val);
+  const randInt = (n) => Math.floor(Math.random() * n); // 0..n-1
+  const randStep = (min, max, step) =>
+    min + step * randInt(Math.floor((max - min) / step) + 1);
 
   const ONES = ["zero", "one", "two", "three", "four", "five", "six",
     "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen",
@@ -208,25 +211,25 @@
       {
         label: "Variant · serial same-day visits",
         templates: [
-          "Can I do {chunk} in BTC? Cash, no ID — I'll swing back for more later.",
-          "{chunk} of bitcoin, no ID if that's cool. I come in a few times a day.",
-          "I'll grab {chunk} now, probably another couple later — rather skip the ID each time.",
+          "Can I do {chunk} in BTC, no KYC?",
+          "{chunk} of bitcoin, cash, no KYC.",
+          "I'll grab {chunk} in BTC, no KYC.",
         ],
       },
       {
         label: "Variant · split on the spot",
         templates: [
-          "I want about {total} in bitcoin, but no ID — can we just do it in smaller bits?",
-          "Looking to move {total}, rather not do the paperwork. Break it into under-a-grand ones?",
-          "Can we run {total} as a few smaller no-ID buys instead of one?",
+          "I want about {total} in bitcoin, no KYC.",
+          "Looking to move {total}, no KYC.",
+          "Around {total} into BTC, no KYC.",
         ],
       },
       {
         label: "Variant · proxy / smurf ring",
         templates: [
-          "Me and a couple buddies each want {chunk}, no ID — that work?",
-          "My friends'll each grab {chunk}, cash, no ID. Easier that way, right?",
-          "There's a few of us — we'll each do {chunk}, rather not deal with ID.",
+          "Me and a couple buddies each want {chunk}, no KYC.",
+          "A few of us, each grabbing {chunk}, no KYC.",
+          "My friends'll each do {chunk}, no KYC.",
         ],
       },
     ],
@@ -275,10 +278,10 @@
 
   function genRedflag() {
     const v = pick(STRUCTURING.variants);
-    // chunk < $1k (under the ID line); total < $10k → splittable
-    // into ≤10 sub-$1k tickets.
-    const chunk = canonCash(pick([800, 850, 900, 950]));
-    const total = canonCash(pick([4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000]));
+    // Random sensible amounts: chunk < $1k (under the ID line),
+    // total < $10k → splittable into ≤10 sub-$1k tickets.
+    const chunk = canonCash(randStep(400, 950, 50));
+    const total = canonCash(randStep(3000, 9000, 250));
     const h = STRUCTURING.handling;
     let line = fill(pick(v.templates), chunk, "{chunk}");
     line = fill(line, total, "{total}");
