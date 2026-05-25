@@ -27,8 +27,10 @@ terms):
   rate/spread encoded — the curated btc[] amounts were just sized
   to land in their CAD bucket.
 - **redflag** = UI "Multiple no-KYC (structuring)" — AML
-  structuring/smurfing, 3 variants (serial same-day, split-on-
-  spot, proxy ring). Statements are phrased as casual basic
+  structuring/smurfing, 2 variants (serial same-day, split-on-
+  spot). Proxy/smurf-ring variant removed per user — no "friends"
+  framing in statements; handling keeps the third-party/on-behalf
+  aggregation point. Statements are phrased as casual basic
   buys with an offhand no-ID preference (that's how real
   structuring presents — the drill is catching it under friendly
   framing), not overt "stay under the limit" talk. Statements are

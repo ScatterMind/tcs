@@ -224,14 +224,6 @@
           "Around {total} into BTC, no KYC.",
         ],
       },
-      {
-        label: "Variant · proxy / smurf ring",
-        templates: [
-          "Me and a couple buddies each want {chunk}, no KYC.",
-          "A few of us, each grabbing {chunk}, no KYC.",
-          "My friends'll each do {chunk}, no KYC.",
-        ],
-      },
     ],
     handling: {
       clarify: [
@@ -249,7 +241,7 @@
       pitfalls: [
         "A casual, friendly 'no-ID preference' is still structuring when it's paired with sub-$1k splitting — the relaxed tone doesn't change the obligation.",
         "\"Sure, let's just do a few smaller ones\" = facilitating structuring = a compliance violation, with personal liability.",
-        "A smurf ring (friends each doing sub-$1k 'on behalf of' one person) still aggregates — same red flag, don't be fooled by separate faces.",
+        "Someone transacting on behalf of another person (a third party) still aggregates to that person — same red flag, don't be fooled by separate faces.",
         "Tipping off is prohibited: don't tell the customer a report is being or will be filed. Stay neutral and professional.",
       ],
     },
