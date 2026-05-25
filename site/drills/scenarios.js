@@ -19,7 +19,7 @@
 
 (function () {
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
-  const fill = (tpl, amt) => tpl.split("{amt}").join(amt);
+  const fill = (tpl, val, ph) => tpl.split(ph || "{amt}").join(val);
 
   const ONES = ["zero", "one", "two", "three", "four", "five", "six",
     "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen",
@@ -208,25 +208,25 @@
       {
         label: "Variant · serial same-day visits",
         templates: [
-          "I'll do {amt} now and come back a few more times today — keeps it under the limit, right?",
-          "Can we keep each one under a grand so there's no ID?",
-          "I'd rather do a few smaller ones through the day than one big buy.",
+          "Can I do {chunk} in BTC? Cash, no ID — I'll swing back for more later.",
+          "{chunk} of bitcoin, no ID if that's cool. I come in a few times a day.",
+          "I'll grab {chunk} now, probably another couple later — rather skip the ID each time.",
         ],
       },
       {
         label: "Variant · split on the spot",
         templates: [
-          "Let's just run it as a few separate {amt} tickets instead of one big one.",
-          "No paperwork if we break it up under the limits, yeah?",
-          "Can you split this into chunks under a thousand?",
+          "I want about {total} in bitcoin, but no ID — can we just do it in smaller bits?",
+          "Looking to move {total}, rather not do the paperwork. Break it into under-a-grand ones?",
+          "Can we run {total} as a few smaller no-ID buys instead of one?",
         ],
       },
       {
         label: "Variant · proxy / smurf ring",
         templates: [
-          "My buddy'll do {amt}, then I'll do {amt}, then my cousin.",
-          "If a few of us each stay under a grand, no ID needed, right?",
-          "I've got some friends with me — we'll each do a small one.",
+          "Me and a couple buddies each want {chunk}, no ID — that work?",
+          "My friends'll each grab {chunk}, cash, no ID. Easier that way, right?",
+          "There's a few of us — we'll each do {chunk}, rather not deal with ID.",
         ],
       },
     ],
@@ -244,6 +244,7 @@
         "File a Suspicious Transaction Report if there are reasonable grounds — STRs have no dollar minimum and cover attempted transactions.",
       ],
       pitfalls: [
+        "A casual, friendly 'no-ID preference' is still structuring when it's paired with sub-$1k splitting — the relaxed tone doesn't change the obligation.",
         "\"Sure, let's just do a few smaller ones\" = facilitating structuring = a compliance violation, with personal liability.",
         "A smurf ring (friends each doing sub-$1k 'on behalf of' one person) still aggregates — same red flag, don't be fooled by separate faces.",
         "Tipping off is prohibited: don't tell the customer a report is being or will be filed. Stay neutral and professional.",
@@ -274,12 +275,17 @@
 
   function genRedflag() {
     const v = pick(STRUCTURING.variants);
-    const small = canonCash(pick([800, 850, 900, 950]));
+    // chunk < $1k (under the ID line); total < $10k → splittable
+    // into ≤10 sub-$1k tickets.
+    const chunk = canonCash(pick([800, 850, 900, 950]));
+    const total = canonCash(pick([4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000]));
     const h = STRUCTURING.handling;
+    let line = fill(pick(v.templates), chunk, "{chunk}");
+    line = fill(line, total, "{total}");
     return {
       category: "redflag",
       tag: STRUCTURING.tag,
-      line: fill(pick(v.templates), small),
+      line: line,
       context: v.label,
       clarify: h.clarify,
       math: h.math,

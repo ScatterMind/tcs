@@ -28,10 +28,16 @@ terms):
   to land in their CAD bucket.
 - **redflag** = UI "Multiple no-KYC (structuring)" — AML
   structuring/smurfing, 3 variants (serial same-day, split-on-
-  spot, proxy ring). Teaches recognition + the compliant response
-  (24h aggregation, $1k ID line, $10k report line, STR-no-
-  threshold, no tipping-off). General FINTRAC only — no shop SOP,
-  per "Do not publish". No math section.
+  spot, proxy ring). Statements are phrased as casual basic
+  buys with an offhand no-ID preference (that's how real
+  structuring presents — the drill is catching it under friendly
+  framing), not overt "stay under the limit" talk. Amounts:
+  chunk < $1k (`{chunk}` $800–950), total < $10k (`{total}`
+  ≤$9k) so it's splittable into ≤10 sub-$1k tickets. Teaches
+  recognition + the compliant response (24h aggregation, $1k ID
+  line, $10k report line, STR-no-threshold, no tipping-off).
+  General FINTRAC only — no shop SOP, per "Do not publish". No
+  math section.
 
 Interaction: Generate draws a scenario; Reveal toggles the
 handling; **Complete** logs it to a "last 10 completed" list and
