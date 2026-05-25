@@ -1,240 +1,295 @@
-/* Trade-mechanics scenarios for The Coin Shack employee drills.
+/* Procedural drill generator for The Coin Shack counter training.
  *
- * Each scenario describes what a customer says, then encodes the
- * expected operator handling. Math uses placeholder symbols
- * (MID/ASK/BID/s) — the operator fills in real numbers from the
- * shop's live feed and policy. Shop spread, confirmation counts,
- * quote validity windows, and any specific SOPs stay out of this
- * file. */
+ * Two categories:
+ *   "trade"   — trade-mechanics conversions. 4 types (direction ×
+ *               which side the customer pins) across 4 CAD price
+ *               tiers. Amount is randomized within the tier and the
+ *               phrasing rotates so trainees can't memorize a fixed
+ *               set.
+ *   "redflag" — AML red flags. Currently: structuring (smurfing) —
+ *               a customer trying to split transactions under the
+ *               $1k ID line and $10k reporting line. The drill
+ *               teaches recognition + the compliant response, never
+ *               how to accommodate it.
+ *
+ * Pricing math stays symbolic (MID/ASK/BID/s) — the operator pulls
+ * the live number. Curated tier amounts were sized to land in their
+ * CAD bucket at a rough working price; no shop rate, spread, or SOP
+ * is encoded here (see HANDOFF "Do not publish"). */
 
 (function () {
-  // direction: which way the value flows
-  //   "c2b" — customer pays cash, receives BTC
-  //   "b2c" — customer sends BTC, receives cash
-  //
-  // constraint: which side the customer pinned
-  //   "cash-in"  — fixed cash they're handing over (c2b)
-  //   "btc-out"  — fixed BTC they want to receive (c2b)
-  //   "btc-in"   — fixed BTC they're sending (b2c)
-  //   "cash-out" — fixed cash they want to receive (b2c)
-  //   "round"    — approximate ("about $500 worth"); needs clarification
-  //
-  // edge: optional modifier
-  //   "stale-quote"  — they were quoted earlier, now stale
-  //   "mid-move"     — price moved during the transaction
-  //   "mid-vs-ask"   — customer is comparing your price to a public mid feed
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const fill = (tpl, amt) => tpl.split("{amt}").join(amt);
 
-  const scenarios = [
+  const ONES = ["zero", "one", "two", "three", "four", "five", "six",
+    "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen",
+    "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+  const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty",
+    "seventy", "eighty", "ninety"];
+  function words(n) {
+    if (n < 20) return ONES[n];
+    if (n < 100) return TENS[Math.floor(n / 10)] + (n % 10 ? "-" + ONES[n % 10] : "");
+    return String(n);
+  }
+
+  // Spoken renderings of a cash amount; pick one for phrasing variety.
+  function renderCash(n) {
+    const forms = ["$" + n.toLocaleString("en-US")];
+    if (n % 1000 === 0 && n / 1000 <= 25) forms.push(words(n / 1000) + " grand");
+    if (n % 1000 === 0) forms.push("$" + n / 1000 + "k");
+    if (n % 100 === 0 && n < 1000) forms.push(words(n / 100) + " hundred");
+    return pick(forms);
+  }
+
+  // Spoken renderings of a BTC amount.
+  function renderBtc(n) {
+    const forms = [n + " BTC", n + " bitcoin"];
+    if (n === 0.5) forms.push("half a coin", "half a bitcoin");
+    if (n === 0.25) forms.push("a quarter of a coin");
+    if (n === 0.1) forms.push("a tenth of a coin");
+    if (n === 0.05) forms.push("point oh five bitcoin");
+    return pick(forms);
+  }
+
+  // CAD tiers with curated amounts. btc[] values are sized to fall
+  // in the same CAD bucket at a rough working price — illustrative
+  // sizing only, not an encoded rate.
+  const TIERS = [
     {
-      id: "c2b-cash-in",
-      tag: "Cash → BTC · customer pinned cash in",
-      line: "I've got $500 cash. Give me bitcoin.",
-      clarify: [
-        "Do you have a wallet ready? Can you pull up the receive address?",
-        "Confirm denomination breakdown of the cash before counting.",
-      ],
-      math: "BTC_out = $500 / ASK",
-      procedure: [
-        "Customer shows receive address; you read it back to them — never trust clipboard.",
-        "Count cash; verify quality (no obvious counterfeits, no banded bricks without explanation).",
-        "Pull live MID from the reference feed; compute ASK.",
-        "State the BTC amount and the ASK price out loud; get verbal accept.",
-        "Send BTC; show the broadcast txid to the customer.",
-        "Print/record the transaction per shop record-keeping policy.",
-      ],
-      pitfalls: [
-        "Clipboard-swap malware: always read the address aloud and have the customer confirm character groups.",
-        "ASK ≠ what they saw on Google. Be ready to explain the spread up front, not after they object.",
-        "Customer asks you to type the address — you can read, they type/scan. Avoid touching their device.",
-      ],
+      id: 1, label: "Tier 1 · $100–$1,000",
+      cash: [100, 150, 200, 250, 300, 400, 500, 600, 750, 800, 900],
+      btc: [0.002, 0.004, 0.006, 0.008, 0.01],
     },
     {
-      id: "c2b-btc-out",
-      tag: "Cash → BTC · customer pinned BTC out",
-      line: "I want exactly 0.025 BTC.",
-      clarify: [
-        "Confirm 0.025 BTC exactly (read decimal places back to them).",
-        "Wallet ready?",
-      ],
-      math: "cash_in = 0.025 × ASK  (round UP to the nearest cent per shop rounding policy)",
-      procedure: [
-        "Confirm wallet address as in the cash-pinned case.",
-        "Pull live MID; compute ASK; multiply.",
-        "Quote the cash amount; get verbal accept.",
-        "Customer hands over cash; count and verify before sending BTC.",
-        "Send BTC; show txid; record.",
-      ],
-      pitfalls: [
-        "Customer brings exact bills but came in expecting a different BTC amount — re-clarify which side they pinned.",
-        "Rounding asymmetry: if you round BTC down and cash up the shop wins by a hair every time. Be explicit so it doesn't read as sneaky.",
-      ],
+      id: 2, label: "Tier 2 · $1,000–$5,000",
+      cash: [1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500],
+      btc: [0.015, 0.02, 0.025, 0.03, 0.04, 0.05],
     },
     {
-      id: "c2b-mid-vs-ask",
-      tag: "Cash → BTC · mid-vs-ask framing",
-      line: "Bitcoin's at $90,000 right now — how much do I get for $500?",
-      clarify: [
-        "Anchor expectation: the $90k they saw is mid-market. The shop sells at ASK, which is MID + spread.",
-        "Show them the breakdown if they want it: MID, spread %, ASK, resulting BTC.",
-      ],
-      math: "ASK = MID × (1 + s);  BTC_out = $500 / ASK",
-      procedure: [
-        "Open with the spread before they ask — 'our price is X% over the live market for cash settlement'.",
-        "Quote ASK and BTC_out together.",
-        "If they push back, offer the comparison transparently — don't hide it.",
-      ],
-      pitfalls: [
-        "Don't fudge the math to make ASK look like MID — destroys trust if they spot it later.",
-        "Don't argue about whether the spread is 'fair'. Quote it; let them decide.",
-      ],
+      id: 3, label: "Tier 3 · $5,000–$10,000",
+      cash: [5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500],
+      btc: [0.06, 0.07, 0.08, 0.09, 0.1],
     },
     {
-      id: "b2c-btc-in",
-      tag: "BTC → Cash · customer pinned BTC in",
-      line: "I'm sending 0.05 BTC. How much cash do I get?",
-      clarify: [
-        "Confirm 0.05 BTC exactly.",
-        "Confirm method: scan operator deposit QR vs. paste address.",
-      ],
-      math: "cash_out = 0.05 × BID",
-      procedure: [
-        "Generate a fresh deposit address in the operator wallet (never reuse).",
-        "Show the QR; have customer scan and stage the send on their device.",
-        "Pull live MID; compute BID; quote cash_out; get verbal accept.",
-        "Customer broadcasts. Wait for confirmations per shop policy before paying.",
-        "Count and hand over cash; record the transaction.",
-      ],
-      pitfalls: [
-        "Zero-conf payout = double-spend risk. Confirmation count is policy, not negotiable.",
-        "Customer's mempool fee is too low → tx stuck. Have a policy line for what to do (wait? RBF guidance? send back?).",
-        "Customer sends to the wrong address (theirs, not yours): you cannot recover. Verify they're scanning YOUR QR, not their own previous one.",
-      ],
-    },
-    {
-      id: "b2c-cash-out",
-      tag: "BTC → Cash · customer pinned cash out",
-      line: "I need exactly $1,000 in cash. How much BTC do I send?",
-      clarify: [
-        "Confirm $1,000 exact (not 'about').",
-        "Decide rounding direction with them: round BTC up so they're guaranteed ≥ $1,000, or round to a clean BTC amount and accept a few dollars over/under.",
-      ],
-      math: "BTC_in = $1,000 / BID  (round to satoshi per shop rounding policy)",
-      procedure: [
-        "Quote the BTC amount with the cash payout side-by-side.",
-        "Generate deposit address; show QR; customer sends EXACTLY the quoted BTC.",
-        "Wait for confirmations per shop policy.",
-        "Pay out $1,000; record.",
-      ],
-      pitfalls: [
-        "Customer eyeballs the amount and sends approximate BTC. If under, top-up or partial refund — have a policy. If over, refund the overage in cash or BTC per policy.",
-        "Customer asks to be paid in a specific denomination mix — check till has it before quoting.",
-      ],
-    },
-    {
-      id: "round-ask",
-      tag: "Either direction · round-number approximation",
-      line: "Give me, like, $500-ish of bitcoin. Whatever's clean.",
-      clarify: [
-        "Pin one side before computing. Ask: 'Do you want $500 cash even, or a round BTC amount that's near $500?'",
-        "If they truly don't care, default to round cash on their side — easier for cash handling.",
-      ],
-      math: "Once a side is pinned, it collapses to one of the standard cases.",
-      procedure: [
-        "Convert 'about' into 'exactly'. Restate before computing.",
-        "Proceed with whichever standard case the clarification produced.",
-      ],
-      pitfalls: [
-        "Don't compute on 'about'. Customers later remember the exact number you said and ignore that you asked.",
-        "Round-asks are the most common source of after-the-fact disputes. Restate the exact pinned number out loud before pulling a quote.",
-      ],
-      edge: "round",
-    },
-    {
-      id: "stale-quote",
-      tag: "Either direction · stale quote",
-      line: "You quoted me 12 minutes ago. I'll take it.",
-      clarify: [
-        "Acknowledge the earlier quote but pull a fresh one — quotes expire per shop validity policy.",
-        "If they're upset: explain the price moved both ways during that time; the shop holds quotes for X minutes precisely because of this.",
-      ],
-      math: "Recompute with current MID. Old quote is reference only.",
-      procedure: [
-        "Pull fresh MID; recompute ASK or BID.",
-        "Compare side-by-side with the prior quote so the change is visible.",
-        "If new quote is better for them: hand them the win, build trust.",
-        "If worse: stand on the validity policy, don't negotiate it case-by-case.",
-      ],
-      pitfalls: [
-        "Honoring stale quotes ad-hoc trains customers to stall and lock in good moves.",
-        "Per-shop policy varies — write it down so all employees say the same thing.",
-      ],
-      edge: "stale-quote",
-    },
-    {
-      id: "mid-move",
-      tag: "Either direction · price moved mid-transaction",
-      line: "(BTC moved 1.5% between your quote and the customer finishing the cash count.)",
-      clarify: [
-        "Did the move cross the shop's re-quote threshold?",
-        "Move in customer's favor or shop's favor?",
-      ],
-      math: "If within re-quote threshold: honor the quote. If outside: pull a fresh quote and explain.",
-      procedure: [
-        "Within tolerance: complete the trade at the quoted price. Eat the small swing — it averages out and customer trust is worth more.",
-        "Outside tolerance: stop the count. Explain the move, show the new price, ask if they want to proceed at the new number.",
-      ],
-      pitfalls: [
-        "Always re-quoting on micro-moves looks predatory. Always honoring on big moves bleeds the shop.",
-        "Per-shop policy: define the tolerance % and write it visibly so it's not a judgment call mid-trade.",
-      ],
-      edge: "mid-move",
-    },
-    {
-      id: "wallet-not-ready",
-      tag: "Cash → BTC · customer has no wallet",
-      line: "I want to buy bitcoin. Wait — do I need a wallet?",
-      clarify: [
-        "Yes — shop never holds custody after the trade. They need a wallet they control.",
-        "Are they comfortable installing one now, or want to come back?",
-      ],
-      math: "(No trade until wallet exists.)",
-      procedure: [
-        "Hand them the shop's wallet-setup printout (recommended wallets, plain instructions).",
-        "They set up the wallet THEMSELVES — never type a seed phrase, never see a seed phrase, never touch their device.",
-        "When wallet is set up, they show you the receive address; trade proceeds as cash-in / btc-out standard case.",
-      ],
-      pitfalls: [
-        "Touching their phone or seeing their seed phrase puts the shop on the hook for any future loss. Hands off — always.",
-        "Don't recommend a custodial wallet as 'easier' — defeats the point and creates KYC ambiguity.",
-        "If they don't want to set one up now: refund and walk them out friendly. No trade.",
-      ],
-      edge: "round",
-    },
-    {
-      id: "direction-confusion",
-      tag: "Either direction · terminology confusion",
-      line: "Can I buy cash with my bitcoin?",
-      clarify: [
-        "Restate the direction in plain terms: 'You want to sell bitcoin and receive cash — that's BTC → cash. Is that right?'",
-        "Confirm before any math.",
-      ],
-      math: "(Standard b2c once direction is confirmed.)",
-      procedure: [
-        "Mirror their language but use unambiguous terms when you restate.",
-        "Proceed with standard b2c flow.",
-      ],
-      pitfalls: [
-        "'Buy' and 'sell' are reversed in some customers' heads — confirm in customer-facing language, not trader jargon.",
-        "If they say one thing but the math implies another, stop and re-confirm.",
-      ],
+      id: 4, label: "Tier 4 · >$10,000",
+      cash: [11000, 12000, 13000, 15000, 18000, 20000, 25000],
+      btc: [0.12, 0.15, 0.2, 0.25, 0.3, 0.5],
     },
   ];
 
-  // Random pick respecting the edge-case filter.
-  function pickScenario(includeEdge) {
-    const pool = includeEdge ? scenarios : scenarios.filter((s) => !s.edge);
-    return pool[Math.floor(Math.random() * pool.length)];
+  const CONVERSIONS = [
+    {
+      pin: "cash",
+      tag: "Cash → BTC · customer pinned cash in",
+      templates: [
+        "I've got {amt} cash — turn it into Bitcoin.",
+        "Here's {amt}. Load up my wallet.",
+        "Can I put {amt} into bitcoin?",
+        "{amt} in cash. How much BTC is that?",
+        "Wanna buy some bitcoin with {amt}.",
+      ],
+      handling: (amt) => ({
+        clarify: [
+          "Wallet ready? Have them pull up the receive address.",
+          "Confirm the cash denomination breakdown before you start counting.",
+        ],
+        math: `BTC_out = ${amt} ÷ ASK   (ASK = MID × (1 + s); pull live MID)`,
+        procedure: [
+          "Read the receive address back aloud — never trust the clipboard.",
+          "Count the cash; check quality (no obvious counterfeits, no unexplained banded bricks).",
+          "Pull live MID; compute ASK.",
+          "State the BTC amount and the ASK out loud; get a verbal accept.",
+          "Send BTC; show the broadcast txid.",
+          "Record the transaction per shop record-keeping policy.",
+        ],
+        pitfalls: [
+          "Clipboard-swap malware: confirm the address in character groups, not at a glance.",
+          "ASK ≠ the price they saw on Google — explain the spread up front, not after they object.",
+          "You read the address, they type or scan it. Don't touch their device.",
+        ],
+      }),
+    },
+    {
+      pin: "btc",
+      tag: "Cash → BTC · customer pinned BTC out",
+      templates: [
+        "I want exactly {amt}. What's that cost me?",
+        "Need {amt} — how much cash?",
+        "Give me {amt}.",
+        "Looking to grab {amt} today. What's the cash?",
+        "Can you sell me {amt}?",
+      ],
+      handling: (amt) => ({
+        clarify: [
+          `Confirm ${amt} exactly — read the decimal places back to them.`,
+          "Wallet ready?",
+        ],
+        math: `cash_in = ${amt} × ASK   (round per shop rounding policy)`,
+        procedure: [
+          "Confirm the receive address (read it back aloud).",
+          "Pull live MID; compute ASK; multiply.",
+          "Quote the cash amount; get a verbal accept.",
+          "Take the cash; count and verify before sending any BTC.",
+          "Send BTC; show the txid; record.",
+        ],
+        pitfalls: [
+          "They may have walked in expecting a different BTC amount — re-confirm which side they pinned.",
+          "Rounding asymmetry (BTC down, cash up) reads as sneaky if hidden — state it plainly.",
+        ],
+      }),
+    },
+    {
+      pin: "btc",
+      tag: "BTC → Cash · customer pinned BTC in",
+      templates: [
+        "I'm sending {amt} — what do I get back?",
+        "Cashing out {amt} today.",
+        "How much for {amt}?",
+        "Selling {amt}. What's my payout?",
+        "Got {amt} to sell. How much cash?",
+      ],
+      handling: (amt) => ({
+        clarify: [
+          `Confirm ${amt} exactly.`,
+          "Method: scan the operator deposit QR vs. paste an address.",
+        ],
+        math: `cash_out = ${amt} × BID   (BID = MID × (1 − s); pull live MID)`,
+        procedure: [
+          "Generate a fresh deposit address in the operator wallet (never reuse).",
+          "Show the QR; have them stage the send on their device.",
+          "Pull live MID; compute BID; quote the cash; get a verbal accept.",
+          "Wait for confirmations per shop policy before paying out.",
+          "Count and hand over the cash; record.",
+        ],
+        pitfalls: [
+          "Zero-conf payout = double-spend risk; confirmation count is policy, not negotiable.",
+          "Low mempool fee → stuck tx. Have a policy line (wait? RBF guidance? send back?).",
+          "They must scan YOUR QR — not reuse an old address of their own. Verify.",
+        ],
+      }),
+    },
+    {
+      pin: "cash",
+      tag: "BTC → Cash · customer pinned cash out",
+      templates: [
+        "I need exactly {amt} in my hand. How much do I send?",
+        "Gotta walk out with {amt} — how much BTC?",
+        "Can you do {amt}? I'll send whatever it takes.",
+        "Need {amt} cash. What's that in bitcoin?",
+        "{amt} out the door. How much do I send over?",
+      ],
+      handling: (amt) => ({
+        clarify: [
+          `Confirm ${amt} exact, not "about".`,
+          `Rounding: round BTC up so they're guaranteed ≥ ${amt}, or use a clean BTC amount and accept a few dollars over/under — decide with them.`,
+        ],
+        math: `BTC_in = ${amt} ÷ BID   (round to the satoshi per shop policy)`,
+        procedure: [
+          "Quote the BTC amount with the cash payout side by side.",
+          "Generate a deposit address; show the QR; they send EXACTLY the quoted BTC.",
+          "Wait for confirmations per shop policy.",
+          `Pay out ${amt}; record.`,
+        ],
+        pitfalls: [
+          "They may eyeball it and send approximate BTC. Under → top-up or partial refund; over → refund the overage. Have a policy.",
+          "Denomination mix: check the till can make the payout before quoting.",
+        ],
+      }),
+    },
+  ];
+
+  const STRUCTURING = {
+    tag: "Red flag · structuring (smurfing)",
+    variants: [
+      {
+        label: "Variant · serial same-day visits",
+        templates: [
+          "I'll do {amt} now and come back a few more times today — keeps it under the limit, right?",
+          "Can we keep each one under a grand so there's no ID?",
+          "I'd rather do a few smaller ones through the day than one big buy.",
+        ],
+      },
+      {
+        label: "Variant · split on the spot",
+        templates: [
+          "Let's just run it as a few separate {amt} tickets instead of one big one.",
+          "No paperwork if we break it up under the limits, yeah?",
+          "Can you split this into chunks under a thousand?",
+        ],
+      },
+      {
+        label: "Variant · proxy / smurf ring",
+        templates: [
+          "My buddy'll do {amt}, then I'll do {amt}, then my cousin.",
+          "If a few of us each stay under a grand, no ID needed, right?",
+          "I've got some friends with me — we'll each do a small one.",
+        ],
+      },
+    ],
+    handling: {
+      clarify: [
+        "Recognize the pattern: ticket sizes deliberately under the $1k ID line and the total kept under the $10k report line. The pattern itself is the signal.",
+        "Do NOT coach them on staying under thresholds, and do NOT split a ticket to accommodate the request.",
+      ],
+      math: null,
+      procedure: [
+        "Same person, same type of transaction within 24 hours aggregates into a single large-transaction report once the total hits $10k — splitting doesn't avoid it.",
+        "The $1k ID requirement applies per transaction; chopping under it is the red flag, not a workaround.",
+        "Require ID per shop policy. If they refuse or walk away, the attempt is itself documentable and reportable.",
+        "Document the interaction and escalate to the shop's compliance officer.",
+        "File a Suspicious Transaction Report if there are reasonable grounds — STRs have no dollar minimum and cover attempted transactions.",
+      ],
+      pitfalls: [
+        "\"Sure, let's just do a few smaller ones\" = facilitating structuring = a compliance violation, with personal liability.",
+        "A smurf ring (friends each doing sub-$1k 'on behalf of' one person) still aggregates — same red flag, don't be fooled by separate faces.",
+        "Tipping off is prohibited: don't tell the customer a report is being or will be filed. Stay neutral and professional.",
+      ],
+    },
+  };
+
+  function genTrade(tierSel) {
+    const tier = tierSel && tierSel !== "any"
+      ? TIERS.find((t) => t.id === Number(tierSel)) || pick(TIERS)
+      : pick(TIERS);
+    const conv = pick(CONVERSIONS);
+    const amtNum = conv.pin === "cash" ? pick(tier.cash) : pick(tier.btc);
+    const amtStr = conv.pin === "cash" ? renderCash(amtNum) : renderBtc(amtNum);
+    const h = conv.handling(amtStr);
+    return {
+      category: "trade",
+      tag: conv.tag,
+      line: fill(pick(conv.templates), amtStr),
+      context: tier.label,
+      clarify: h.clarify,
+      math: h.math,
+      procedure: h.procedure,
+      pitfalls: h.pitfalls,
+    };
   }
 
-  window.TCSDrills = { scenarios, pickScenario };
+  function genRedflag() {
+    const v = pick(STRUCTURING.variants);
+    const small = renderCash(pick([800, 850, 900, 950]));
+    const h = STRUCTURING.handling;
+    return {
+      category: "redflag",
+      tag: STRUCTURING.tag,
+      line: fill(pick(v.templates), small),
+      context: v.label,
+      clarify: h.clarify,
+      math: h.math,
+      procedure: h.procedure,
+      pitfalls: h.pitfalls,
+    };
+  }
+
+  // opts: { categories: ["trade","redflag"], tier: "any"|1|2|3|4 }
+  function generate(opts) {
+    opts = opts || {};
+    const cats = opts.categories && opts.categories.length
+      ? opts.categories : ["trade"];
+    return pick(cats) === "redflag" ? genRedflag() : genTrade(opts.tier);
+  }
+
+  window.TCSDrills = { generate, TIERS };
 })();

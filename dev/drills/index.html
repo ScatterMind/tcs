@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Trade Mechanics Drill — The Coin Shack</title>
+  <title>Counter Drills — The Coin Shack</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
-    <h1>Trade Mechanics Drill</h1>
+    <h1>Counter Drills</h1>
     <nav>
       <button class="tab" data-tab="drill" aria-pressed="true">Drill</button>
       <button class="tab" data-tab="flowchart" aria-pressed="false">Flowchart</button>
@@ -21,10 +21,40 @@
       <div class="controls">
         <button id="generate" class="primary">Generate scenario</button>
         <label class="filter">
-          <input type="checkbox" id="filter-edge" checked>
-          Include edge cases (stale quote, mid-move, round ask)
+          Tier
+          <select id="tier-filter">
+            <option value="any">Any</option>
+            <option value="1">1 · $100–$1,000</option>
+            <option value="2">2 · $1,000–$5,000</option>
+            <option value="3">3 · $5,000–$10,000</option>
+            <option value="4">4 · &gt;$10,000</option>
+          </select>
         </label>
       </div>
+
+      <fieldset class="categories">
+        <legend>Categories</legend>
+        <label class="filter">
+          <input type="checkbox" id="cat-trade" checked>
+          Trade mechanics (BTC)
+        </label>
+        <label class="filter">
+          <input type="checkbox" id="cat-redflag" checked>
+          Red flags (structuring)
+        </label>
+        <label class="filter disabled" title="Planned — not built yet">
+          <input type="checkbox" disabled>
+          USDT transactions <span class="soon">soon</span>
+        </label>
+        <label class="filter disabled" title="Planned — not built yet">
+          <input type="checkbox" disabled>
+          Basic transactions <span class="soon">soon</span>
+        </label>
+        <label class="filter disabled" title="Planned — not built yet">
+          <input type="checkbox" disabled>
+          Other coin transactions <span class="soon">soon</span>
+        </label>
+      </fieldset>
 
       <article id="scenario-card" class="card" hidden>
         <div class="scenario-tag" id="scenario-tag"></div>
@@ -37,7 +67,7 @@
             <h3>Clarify first</h3>
             <ul id="clarify"></ul>
           </section>
-          <section>
+          <section id="math-section">
             <h3>Math</h3>
             <div id="math" class="math"></div>
           </section>
@@ -87,13 +117,23 @@
         <dd>How many on-chain confirmations to wait for before paying out cash on a BTC→cash deposit. Per shop policy.</dd>
       </dl>
 
-      <h2>What this drill covers</h2>
-      <p>Trade mechanics only (direction, constraint side, fee framing, quote handling, round-number asks). FINTRAC/AML and customer-side red flags are separate drill sets — not in this cut.</p>
+      <h2>Compliance lines referenced</h2>
+      <dl class="reference">
+        <dt>$1,000 ID line</dt>
+        <dd>Identity verification required at/above this amount per virtual-currency exchange transaction. General FINTRAC — not shop-specific.</dd>
+        <dt>$10,000 report line</dt>
+        <dd>Large-transaction reporting threshold. Same-person, same-type transactions aggregate over a 24-hour window — splitting doesn't avoid it.</dd>
+        <dt>STR</dt>
+        <dd>Suspicious Transaction Report. No dollar minimum; required on reasonable grounds to suspect, including attempted transactions. Tipping off the customer is prohibited.</dd>
+      </dl>
+
+      <h2>What this covers</h2>
+      <p>Two drill types: <strong>trade mechanics</strong> (direction × which side the customer pins, across four CAD tiers, randomized amounts) and <strong>red flags</strong> (currently structuring / smurfing — recognizing and correctly handling attempts to split under the ID and reporting lines). USDT and other-coin drills are planned. Customer-side red flags like scam-victim and counterfeit remain a separate set.</p>
     </section>
   </main>
 
   <footer>
-    <span class="muted">Trade-mechanics drill · <code>site/drills/</code></span>
+    <span class="muted">Counter drills (trade mechanics + red flags) · <code>site/drills/</code></span>
   </footer>
 
   <script src="scenarios.js"></script>
@@ -102,7 +142,8 @@
   <script type="module">
     import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
     window.__mermaid = mermaid;
-    mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "strict" });
+    const dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "neutral", securityLevel: "strict" });
   </script>
 </body>
 </html>
