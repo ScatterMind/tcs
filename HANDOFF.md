@@ -37,7 +37,8 @@ Interaction: Generate draws a scenario; Reveal toggles the
 handling; **Complete** logs it to a "last 10 completed" list and
 draws the next; **Skip** draws the next without logging. Completed
 list is in-memory (resets on reload), newest first, capped at 10,
-with a basic/no-KYC chip per entry.
+with a basic/no-KYC chip per entry; a **Clear list** button (shown
+only when non-empty) empties it.
 
 Edge cases (stale-quote/mid-move/mid-vs-ask) and wildcards
 (round-ask/no-wallet/direction-confusion) were dropped from the
@@ -46,7 +47,9 @@ process notes. Greyed-out placeholder checkboxes signal planned
 categories: **USDT**, **other-coin** (not built). Vanilla HTML +
 JS, no build step, Mermaid via CDN. Dark mode is automatic via
 `prefers-color-scheme` (CSS vars override + mermaid theme switch);
-no manual toggle yet.
+no manual toggle yet. `.tab` buttons and `#tier-filter` explicitly
+bind `color: var(--fg)` — without it they fell back to the
+browser's default dark button text, invisible on the dark bg.
 
 `scenarios.js` is testable headless: `eval` it with a stub
 `window`, then call `window.TCSDrills.generate({categories,tier})`.

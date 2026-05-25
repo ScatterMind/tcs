@@ -49,6 +49,11 @@
     draw();
   });
 
+  $("clear-completed").addEventListener("click", () => {
+    completed = [];
+    renderCompleted();
+  });
+
   $("reveal").addEventListener("click", () => {
     const panel = $("handling");
     const btn = $("reveal");
@@ -68,6 +73,7 @@
     const ol = $("completed-list");
     const empty = $("completed-empty");
     ol.innerHTML = "";
+    $("clear-completed").hidden = completed.length === 0;
     if (!completed.length) {
       empty.hidden = false;
       return;
@@ -139,4 +145,6 @@
     target.innerHTML = svg;
     flowchartRendered = true;
   }
+
+  renderCompleted();
 })();
