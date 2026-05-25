@@ -19,7 +19,6 @@
   <main>
     <section id="tab-drill" class="tab-panel" aria-hidden="false">
       <div class="controls">
-        <button id="generate" class="primary">Generate scenario</button>
         <label class="filter">
           Tier
           <select id="tier-filter">
@@ -83,9 +82,10 @@
         </div>
       </article>
 
-      <p id="empty-state" class="muted">
-        Click <strong>Generate scenario</strong> to draw a drill.
-      </p>
+      <div id="empty-state" class="empty-state">
+        <button id="generate" class="primary">Generate scenario</button>
+        <p id="empty-msg" class="muted">Then use <strong>Complete</strong> or <strong>Skip</strong> to move through drills.</p>
+      </div>
 
       <section class="completed">
         <div class="completed-head">

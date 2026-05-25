@@ -30,9 +30,8 @@
     if ($("cat-redflag").checked) categories.push("redflag");
     if (categories.length === 0) {
       $("scenario-card").hidden = true;
-      const empty = $("empty-state");
-      empty.hidden = false;
-      empty.textContent = "Select at least one category to draw a drill.";
+      $("empty-state").hidden = false;
+      $("empty-msg").textContent = "Select at least one category, then Generate.";
       current = null;
       return;
     }

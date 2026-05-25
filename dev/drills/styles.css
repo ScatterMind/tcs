@@ -231,6 +231,15 @@ blockquote {
   flex-wrap: wrap;
 }
 
+.empty-state {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.empty-state .primary {
+  margin-bottom: 0.6rem;
+}
+
 .completed {
   margin-top: 2rem;
 }
