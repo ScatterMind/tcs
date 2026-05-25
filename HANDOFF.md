@@ -44,9 +44,13 @@ terms):
   General FINTRAC only — no shop SOP, per "Do not publish". No
   math section.
 
-Interaction: Generate draws a scenario; Reveal toggles the
-handling; **Complete** logs it to a "last 10 completed" list and
-draws the next; **Skip** draws the next without logging. Completed
+Interaction: **Generate** lives on the start screen (inside
+`#empty-state`) and disappears once a scenario is showing — you
+then advance only with Complete/Skip. It reappears only if all
+categories are unchecked (the recover/restart path). Reveal
+toggles the handling; **Complete** logs it to a "last 10
+completed" list and draws the next; **Skip** draws the next
+without logging. Completed
 list is in-memory (resets on reload), newest first, capped at 10,
 with a basic/no-KYC chip per entry; a **Clear list** button (shown
 only when non-empty) empties it.
