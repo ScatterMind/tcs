@@ -32,8 +32,13 @@
     return String(n);
   }
 
-  // Spoken renderings of a cash amount; pick one for phrasing variety.
-  function renderCash(n) {
+  // Canonical (numeric) renderings — used in math + handling text.
+  const canonCash = (n) => "$" + n.toLocaleString("en-US");
+  const canonBtc = (n) => n + " BTC";
+
+  // Spoken renderings — varied phrasing, used only in the customer
+  // statement line (never in the math, which needs the numeric form).
+  function spokenCash(n) {
     const forms = ["$" + n.toLocaleString("en-US")];
     if (n % 1000 === 0 && n / 1000 <= 25) forms.push(words(n / 1000) + " grand");
     if (n % 1000 === 0) forms.push("$" + n / 1000 + "k");
@@ -41,8 +46,7 @@
     return pick(forms);
   }
 
-  // Spoken renderings of a BTC amount.
-  function renderBtc(n) {
+  function spokenBtc(n) {
     const forms = [n + " BTC", n + " bitcoin"];
     if (n === 0.5) forms.push("half a coin", "half a bitcoin");
     if (n === 0.25) forms.push("a quarter of a coin");
@@ -253,12 +257,13 @@
       : pick(TIERS);
     const conv = pick(CONVERSIONS);
     const amtNum = conv.pin === "cash" ? pick(tier.cash) : pick(tier.btc);
-    const amtStr = conv.pin === "cash" ? renderCash(amtNum) : renderBtc(amtNum);
-    const h = conv.handling(amtStr);
+    const spoken = conv.pin === "cash" ? spokenCash(amtNum) : spokenBtc(amtNum);
+    const canon = conv.pin === "cash" ? canonCash(amtNum) : canonBtc(amtNum);
+    const h = conv.handling(canon);
     return {
       category: "trade",
       tag: conv.tag,
-      line: fill(pick(conv.templates), amtStr),
+      line: fill(pick(conv.templates), spoken),
       context: tier.label,
       clarify: h.clarify,
       math: h.math,
@@ -269,7 +274,7 @@
 
   function genRedflag() {
     const v = pick(STRUCTURING.variants);
-    const small = renderCash(pick([800, 850, 900, 950]));
+    const small = canonCash(pick([800, 850, 900, 950]));
     const h = STRUCTURING.handling;
     return {
       category: "redflag",
