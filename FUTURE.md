@@ -3,8 +3,8 @@
 Forward-looking notes for tcs. Vague goals and queued work.
 
 This is the **human-facing** roadmap; HANDOFF.md is the AI's
-internal notebook. Cross-Claude channels live in HANDOFF (`## From
-meta` / `## For meta`), not here.
+internal notebook. Cross-Claude channels live in `CHAT.md`
+(`## Inbox` / `## Outbox` / `## Archive`), not here.
 
 ## How this file works
 
