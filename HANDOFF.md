@@ -120,88 +120,12 @@ This repo is one of several under the `ScatterMind` GitHub account,
 organized by a **control-plane Claude session** in [`scattermind/meta`](https://github.com/ScatterMind/meta). Things a fresh per-repo session should know:
 
 - **`.claude/settings.json` is byte-identical across every ScatterMind repo.** Meta is canonical. If you need to change a hook, propose the change in `scattermind/meta` first, merge there, then mirror byte-for-byte here via a separate PR — never edit this file in isolation. (Meta HANDOFF "Daedalus drift incident" has the cautionary tale.)
-- **Cross-Claude message channels live in this HANDOFF** (below). Two sections:
-  - `## From meta` — meta-session writes allocated tasks or notes here. Read at session start for direction.
-  - `## For meta` — write here when there's something meta should know. Meta reads it at its next multi-repo session start (via `scattermind/meta/setup/multi-repo-prime.sh`, which extracts those two sections from each sibling HANDOFF).
+- **Cross-Claude message channels live in `CHAT.md`** (6th standard file, added 2026-05-28). Three sections:
+  - `## Inbox` — meta and other repos drop messages here addressed to tcs's Claude. Read at session start; drain by acting then moving entries to `## Archive`.
+  - `## Outbox` — write here when there's something meta should know. Meta reads it at its next multi-repo session start (via `scattermind/meta/setup/multi-repo-prime.sh`, which extracts each sibling's `CHAT.md ## Outbox`).
+  - `## Archive` — drained messages, newest on top, kept indefinitely.
 - **Templates** for repeated repo shapes live in [`scattermind/meta/templates/`](https://github.com/ScatterMind/meta/tree/main/templates). Two relevant today: `templates/gh-pages/` (static-`<PUBLISH_DIR>` whitelist) and `templates/gh-pages-allowlist/` (shell-script `ALLOWLIST` array + `claude/**` dev-branch glob). **This repo's deploy matches `gh-pages-allowlist/`** — `.github/workflows/deploy-{main,dev}.yml` + `scripts/build-dist.sh` were wired in PR #3 before the template existed; the template was then generalized from this repo's pattern (see meta #26 / the `## From meta` entry below).
 - **Full meta-side rules** live in [`scattermind/meta/HANDOFF.md`](https://github.com/ScatterMind/meta/blob/main/HANDOFF.md). Skim "Standard project repo structure", "Drift scan — standing meta-session task", and "Multi-repo meta session setup" once.
-
-## From meta
-_Meta-session writes here; tcs's per-repo Claude reads at SessionStart for direction._
-
-- **2026-05-28 — `.claude/settings.json` hardened (meta #36).** Push-to-main
-  deny regex char class flipped from `[[:space:]:+]` to `[[:space:]/:+]`,
-  closing the `/main` bypass — `git push -u origin HEAD:refs/heads/main`
-  (the fully-qualified refspec form) is now blocked along with the three
-  forms already caught (` main`, `:main`, `+main`). Canonical SHA:
-  `396fd187` → `58c01496`. This PR mirrors the change byte-identically to
-  tcs; no behavior change in normal PR workflow, just one
-  previously-bypassing direct-to-main form now also denied. Hooks load at
-  session start, so the new regex takes effect on your NEXT session.
-  **No action required.**
-
-- **2026-05-20 — SessionStart prime FRONT-LOADED + deploy-dev clobber fix
-  (meta #31).** (1) Prime: canonical `.claude/session-start-prime.sh` mirrored
-  byte-for-byte — front-loads diag + truncation note + `source=='compact'`
-  instruction + your resume block into the first ~2KB, slice 12000→6000,
-  `## From meta` inbox ONLY (drops `## For meta` + `FUTURE.md`); prime now ~10KB.
-  (2) **`deploy-dev.yml` got a `paths:` filter** so a meta config/docs mirror
-  branch can't rebuild + clobber your `/dev` (the `claude/**` glob + shared
-  `destination_dir` bug daedalus hit in its session 53). Only `site/**` /
-  `scripts/build-dist.sh` / the workflow now trigger a dev deploy.
-  `.claude/settings.json` UNCHANGED. **No action required** — keep your resume
-  block current.
-
-- **2026-05-20 — Compaction & priming overhaul (meta #27).** Canonical
-  `.claude/settings.json` + a NEW byte-identical companion
-  `.claude/session-start-prime.sh` shipped here byte-for-byte. SessionStart no
-  longer cats the whole HANDOFF — it injects a bounded HEAD slice (`head -c
-  12000` of HANDOFF + this `## From meta` inbox + FUTURE + VISION + a
-  read-on-demand note) so priming fits under the injection cap instead of
-  truncating to a ~2KB preview. `PreCompact` is REMOVED (the `continue:false`
-  block was live-confirmed ineffective on the web harness — it didn't stop
-  auto-summarize). Post-compaction capture moved to a `source=='compact'` branch
-  in the prime script; a temporary `[prime-diag: source=… blob=…B]` line is
-  appended to confirm the cap + whether that branch fires. **NEW convention:**
-  HANDOFF must open with a ≤1.2KB resume block (overwritten in place each
-  session) — this PR seeds one at the top here; keep it current. **No action
-  required** otherwise. Full rationale: meta HANDOFF "## Compaction & priming
-  (head-slice model)". Drift scan now checks BOTH mirrored files.
-- **2026-05-19 — Fresh scaffold (bones only).** First per-repo
-  session tasks: (1) skim the "Do not put in this repo" and "Do
-  not publish" lists above before adding any content;
-  **(2) DONE in tcs PR #3** — `.github/workflows/deploy-{main,dev}.yml`
-  + `scripts/build-dist.sh` shipped with the drill widget. The
-  guidance originally said "copy from jessica-ai-project" — see
-  the meta #26 entry below; the per-repo session refined jessica's
-  pattern (`ALLOWLIST` array + `claude/**` glob) and that refined
-  shape became the meta template; **(3) DONE in tcs PR #3** — dev
-  branch `claude/initial-setup-4mRa7` recorded under "Dev branch"
-  above (note the deploy uses `claude/**` glob, so the literal
-  branch name there is informational only — renames don't break
-  the deploy); (4) when trading-app-revamp work starts, that
-  lives in a new repo (`ScatterMind/coin-shack-app` or similar
-  name TBD), not here.
-- **2026-05-19 — `meta/templates/gh-pages-allowlist/` exists**
-  (meta #26). The original scaffold spec told this repo's
-  per-repo Claude to "copy from `scattermind/jessica-ai-project`'s
-  `scripts/build-dist.sh` allowlist variant" — that was a meta-side
-  mistake (per-repo guidance should point at meta templates, not
-  at other siblings). Your session shipped the deploy anyway and
-  refined jessica's pattern in two useful ways: `ALLOWLIST`
-  array shape instead of inline `cp` lines, and
-  `branches: ['claude/**']` glob instead of a hardcoded dev
-  branch. Both refinements were generalized into the new template,
-  whose body is your pattern verbatim. **No action required**:
-  this repo's deploy already matches the template. Future similar
-  repos instantiate from `meta/templates/gh-pages-allowlist/`
-  rather than copying from here.
-- **2026-05-19 — `.claude/settings.json` hook regex hardened (meta #22).** The Bash PreToolUse `git push` deny regex now also catches the `+main`/`+master` refspec force-push form (character class `[[:space:]:+]`, was `[[:space:]:]`). Found during tcs's own branch-protection testing today: `git push origin +main` bypassed the hook because no space-or-colon preceded "main"; tcs's server-side protection caught it (HTTP 403) but the hook should be the first layer. This PR mirrors the byte-identical canonical to tcs (the scaffold push earlier today shipped the older regex). **No action required**: behavior change only affects force-push attempts on main, which are blocked at both layers now.
-- **2026-05-19 — FUTURE.md format rev2 (meta #23).** Canonical FUTURE.md shape evolved (proposal originated from daedalus's per-repo Claude). New shape: unified `## Backlog` (Goals + Next merged) + `## Archive` for ME-confirmed-done items (newest on top, kept indefinitely — manual prune only) + optional status tags (`[PARTIAL]`/`[QA-PENDING]`/`[BLOCKED]`; `[TODO]` is implicit and the tag can be omitted) alongside the existing ownership tags. This PR mirrors the format here; the 3 former Goals items moved into Backlog with no content changes (just structural). **No action required**: format change only. Tags are optional — the per-repo session apply them when work has shape and status meaningfully differs from "not started."
-
-## For meta
-_tcs's per-repo Claude writes here when there's something meta
-should know — meta reads at its next multi-repo session start._
 
 (empty)
 
@@ -211,3 +135,5 @@ Destructive-action rules are enforced by hooks in
 HANDOFF-update rule is enforced by the Stop hook on real-work
 turns. Read the SessionStart-injected context for the live list.
 Same judgement-based update rules as every other ScatterMind repo.
+
+(Cross-Claude AI-to-AI messages now live in `CHAT.md` — see Inbox / Outbox / Archive there.)
