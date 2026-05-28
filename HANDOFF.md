@@ -129,6 +129,17 @@ organized by a **control-plane Claude session** in [`scattermind/meta`](https://
 ## From meta
 _Meta-session writes here; tcs's per-repo Claude reads at SessionStart for direction._
 
+- **2026-05-28 — `.claude/settings.json` hardened (meta #36).** Push-to-main
+  deny regex char class flipped from `[[:space:]:+]` to `[[:space:]/:+]`,
+  closing the `/main` bypass — `git push -u origin HEAD:refs/heads/main`
+  (the fully-qualified refspec form) is now blocked along with the three
+  forms already caught (` main`, `:main`, `+main`). Canonical SHA:
+  `396fd187` → `58c01496`. This PR mirrors the change byte-identically to
+  tcs; no behavior change in normal PR workflow, just one
+  previously-bypassing direct-to-main form now also denied. Hooks load at
+  session start, so the new regex takes effect on your NEXT session.
+  **No action required.**
+
 - **2026-05-20 — SessionStart prime FRONT-LOADED + deploy-dev clobber fix
   (meta #31).** (1) Prime: canonical `.claude/session-start-prime.sh` mirrored
   byte-for-byte — front-loads diag + truncation note + `source=='compact'`
